@@ -1,31 +1,32 @@
 const express = require("express");
+let users = require('../models/users.mjs');
 const router = express.Router();
-
-router.get('/',(_,res)=>{
-    res.render('index', { title: 'Hey', message: 'Hello there!' });
-});
-router.get('/login',(_,res)=>{
-    res.render('login', { 
-        self: 'Hey', 
-        time: 'Hello there!',
-        rand: 'Hey', 
-        name: 'Hello there!',
-        nameErr: 'Hey', 
-        pass: 'Hello there!', 
-        passErr: 'Hey'
+const reg_controller=require('../controllers/RegisterController.js');
+const log_controller=require('../controllers/LoginController.js');
+router.get('/',async (req,res)=>{
+    let pfpurl = "/images/default/default.png";
+    let setusrHeader = ["Log in", "./login"]
+    if(req.session.token){
+        let name = await users.users_Model.findAll({
+            attributes: ["name"],
+            where:{
+                token:req.session.token
+            }
+        });
+        pfpurl=`/images/userPFP/${name[0].dataValues.name}.png`;
+        setusrHeader[0]="Log Out";
+        setusrHeader[1]="./logout";
+    }
+    res.render('index', { 
+        title: req.session.token,
+        pfpUrl: pfpurl,
+        prof_log: setusrHeader[0],
+        signUrl: setusrHeader[1]
     });
 });
-router.get('/register',(_,res)=>{
-    res.render('register', { 
-        self: 'Hey', 
-        time: 'Hello there!',
-        rand: 'Hey', 
-        name: 'Hello there!',
-        nameErr: 'Hey', 
-        pass: 'Hello there!', 
-        passErr: 'Hey', 
-        email: 'Hello there!', 
-        emailErr: 'Hey'
-    });
-});
+router.get('/login',log_controller.getLoginPage);
+router.post('/login',log_controller.checkLogin);
+router.get('/register',reg_controller.getRegisterPage);
+router.post('/register',reg_controller.Register);
+router.get('/logout',log_controller.logOut);
 module.exports = router;

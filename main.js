@@ -4,7 +4,14 @@ const app = express();
 const PORT = 3000;
 const img_router=require("./routes/images.js");
 const ind=require("./routes/index_page.js");
-
+const session = require("express-session");
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+    secret: "c6310b6d",
+    saveUninitialized: true,
+    resave: true
+}));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/", ind);

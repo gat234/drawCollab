@@ -1,4 +1,4 @@
-import { Sequelize,DataTypes } from '@sequelize/core';
+import { Sequelize,DataTypes,Op } from '@sequelize/core';
 import { MySqlDialect } from '@sequelize/mysql';
 
 
