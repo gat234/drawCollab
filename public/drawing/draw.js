@@ -6,6 +6,46 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 let size = 2;
+const webSocket = new WebSocket(`ws://192.168.1.38:3300/${window.location.pathname}`);
+webSocket.onopen = function(event) {
+  console.log("WebSocket connection established");
+};
+let drawers = [];
+webSocket.onmessage = async function(e) {
+  let d = JSON.parse(e.data);
+  if(!drawers.includes(d.usr)){
+    drawers.push(d.usr);
+    let para = document.createElement("div");
+    let node = document.createTextNode("");
+    para.setAttribute("class","overlay");
+    para.setAttribute("id",d.usr);
+    para.appendChild(node);
+    document.body.appendChild(para);
+  }
+  let usrEl = document.getElementById(d.usr);
+  
+  if (d.held) {
+    if (d.tool == "pen") {
+      let x1 = usrEl.left.replace("px",""), 
+      y1 = usrEl.top.replace("px",""),
+      x2 = d.X,
+      y2 = d.Y;
+      drawLine(x1,y1,x2,y2);
+    }
+    console.log(d.tool,)
+    if (d.tool == "bucket") {
+      bucket(color, d.X, d.Y);
+    }
+  }
+  usrEl.setAttribute("style",`left: ${d.X}px;top:${d.Y}px`);
+  usrEl.left = `${d.X}px`
+  usrEl.top = `${d.Y}px`
+  
+  console.log(e.data);
+}
+function sendCommand(command) {
+  webSocket.send(command);
+}
 window.addEventListener('load', async function () {
   let canvas = document.getElementsByTagName("canvas")[0];
   let ctx = canvas.getContext('2d');
@@ -62,6 +102,14 @@ onmousemove = async function (e) {
     drawLine(x1,y1,x2,y2);
   }
   document.getElementById("bbbb").innerHTML = `X: ${e.clientX} Y: ${e.clientY}`;
+  sendCommand(JSON.stringify({
+    "X":e.clientX,
+    "Y":e.clientY,
+    "usr":sessionStorage.getItem("name"),
+    "path":window.location.pathname,
+    "held":mousePressed,
+    "tool":tool
+  }));
   mouseX = e.clientX;
   mouseY = e.clientY;
 };
@@ -72,9 +120,25 @@ onmousedown = event => {
   if (event.button == 0) {
     if (tool == "pen") {
       mousePressed = true;
+      sendCommand(JSON.stringify({
+        "X":mouseX,
+        "Y":mouseY,
+        "usr":sessionStorage.getItem("name"),
+        "path":window.location.pathname,
+        "held":mousePressed,
+        "tool":tool
+      }));
       createPixel(size, mouseX, mouseY, color);
     }
     if (tool == "bucket") {
+      sendCommand(JSON.stringify({
+        "X":mouseX,
+        "Y":mouseY,
+        "usr":sessionStorage.getItem("name"),
+        "path":window.location.pathname,
+        "held":true,
+        "tool":tool
+      }));
       bucket(color, mouseX, mouseY);
     }
   }
