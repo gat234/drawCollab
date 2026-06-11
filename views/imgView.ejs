@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= imgName %></title>
+    <link rel="icon" type="image/x-icon" href="/images/default/icon.ico">
+</head>
+<body>
+    <%- include('./partial/header.ejs',{dot:".."}) %>
+    <div class="position-relative w-100 vh-100">
+        <img src="<%= c %>" id="img" class="position-absolute top-50 start-50 translate-middle border border-4 z-0">
+        <input id="slidr" type="range" value="25000" min="1" max="200000" class="position-sticky start-50 translate-middle" style="top:90%;">
+    </div>
+    
+    <script>
+        let b64="<%= c %>";
+        b64=b64.replaceAll("/","");
+        b64=atob(b64.slice(21,81));
+        let width = "";
+        let height = "";
+        for(let i=16;i<24;i++){
+            let hx = b64[i].charCodeAt(0).toString(16);
+            if(i<20){
+                width += hx;
+            } else {
+                height += hx;
+            }
+        }
+        width = parseInt(width,16);
+        height = parseInt(height,16);
+        
+        window.addEventListener('load', async function () {
+            let img = document.getElementById("img");
+            let sl = document.getElementById("slidr");
+            size = sl.value/100000;
+            img.style.width = width*size+"px";
+            img.style.height = height*size+"px";
+            sl.oninput = function(e){
+                size=e.target.value/100000;
+                img.style.width = width*size+"px";
+                img.style.height = height*size+"px";
+            }
+        })
+        
+    </script>
+</body>
+</html>

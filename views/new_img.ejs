@@ -1,0 +1,29 @@
+<%- include('./partial/form-partial-t.ejs',{title:"Create image"}) %>
+        <h1 class="h3 mb-3 fw-normal">New image</h1>
+        <input type="hidden" value="<%=rand%>" name="randcheck" />
+        <div class="input-group">
+            <span class="input-group-text">Width</span>
+            <input type="text" name="width" class="form-control" value="<%=width%>">
+            <span class="error"><%=widthErr%></span>
+            <span class="input-group-text">Height</span>
+            <input type="text" name="height" class="form-control" value="<%=height%>">
+            <span class="error"><%=heightErr%></span>
+        </div>
+        <select class="form-select" name="visibility">
+            <option value="0">Public</option>
+            <option value="1">Unlisted</option>
+            <option value="2">Restricted</option>
+            <option value="3">Private</option>
+        </select>
+        <div class="form-floating">
+          <input type="text" name="name" value="<%=name%>" class="form-control" id="floatingName" placeholder="Name">
+          <label for="floatingName">Name</label>
+          <span class="error"><%=nameErr%></span>
+        </div>
+        <div class="d-flex">
+            <button class="btn btn-primary w-100 py-2" type="submit" name="submit" value="Submit">Submit</button>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./index/profile.css">
+    <title><%=name%></title>
+    <link rel="icon" type="image/x-icon" href="/images/default/icon.ico">
+    <style>
+        body{
+            background: #f8f9fa;
+        }
+    </style>
+    <script>
+        window.addEventListener('load', async function () {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        });
+    </script>
+</head>
+<body>
+    <%- include('./partial/header.ejs',{dot:".",mainCheck:true}) %>
+    <div class="px-4 py-5 my-5 text-center"> 
+                     
+        <img src="<%=pfpUrl%>" alt="usrPFP" width="32" height="32" class="d-block mx-auto mb-4" width="72" height="57">
+        <h1 class="display-5 fw-bold text-body-emphasis"><%=name%></h1> 
+        <div class="col-lg-6 mx-auto"> 
+            <p class="lead mb-4">Total visits: <%=totalVisits%></p> 
+        </div> 
+    </div>
+    <div class="album py-5 bg-body-tertiary"> 
+        <div class="container"> 
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3"> 
+                <% for (let i = 0; i < publImg.length; i++) { %>
+                    <div class="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="
+                    Users: <br>
+                    <% for (let x = 0; x < publImg[i].users.length-1; x++) { %>
+                    <%= publImg[i].users[x] %>,<br>
+                    <% } %>
+                    <%= publImg[i].users[publImg[i].users.length-1] %>
+                    ">
+                    
+                        <div class="card shadow-sm"> 
+                            <img src="<%= publImg[i].dUrl %>" >
+                            <div class="card-body"> 
+                                <h1 class="card-text"><%= publImg[i].name %></h1>
+                                <p class="card-text"><%= publImg[i].desc %></p>
+                                <div class="d-flex justify-content-between align-items-center"> 
+                                    <p class="card-text">Visibility: 
+                                    <% if(publImg[i].visibility==0){ %>
+                                    <b>Public</b>
+                                    <% } else if(publImg[i].visibility==1) { %>
+                                    <b>Unlisted</b>
+                                    <% } else if(publImg[i].visibility==2) { %>
+                                    <b>Restricted</b>
+                                    <% } else if(publImg[i].visibility==3) { %>
+                                    <b>Private</b>
+                                    <% } %>
+                                    </p>
+                                    <p>Views: <b><%=publImg[i].visit%></b></p>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center"> 
+                                    <div class="btn-group"> 
+                                        <a type="button" class="btn btn-sm btn-outline-secondary" href="./imageView/<%= publImg[i].url %>">View</a> 
+                                        <a type="button" class="btn btn-sm btn-outline-secondary" href="./image/<%= publImg[i].url %>">edit</a> 
+                                    </div>
+                                    <% if(publImg[i].visibility==1||publImg[i].visibility==2) { %>
+                                        <form action="./changeImgUsr" method="post">
+                                            <input type="hidden" value="<%=publImg[i].url%>" name="imgUrl" />
+                                            <input type="name" class="form-control" id="addUser" placeholder="Username or E-mail" 
+                                            <% if (locals.pass) { %>
+                                                value="<%=usr%>"
+                                            <% } %>
+                                            name="usrName"> 
+                                            <% if (locals.usrErr) { %>
+                                                <span class="red"><%=usrErr%></span>
+                                            <% } %>
+                                            <button class="btn btn-primary w-100 py-2" type="submit">Add/Remove</button> 
+                                        </form>
+                                    <% } %>
+                                    
+                                </div>
+                            </div> 
+                        </div> 
+                    </div> 
+                    
+                <% } %>
+                <% if(publImg.length==0){ %>
+                    <div class="position-relative w-100 h-100">
+                        <h1 class="position-absolute top-50 start-50 translate-middle">No images found!</h1>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

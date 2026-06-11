@@ -9,14 +9,9 @@ exports.Register=async (req,res,next)=>{
     if(pst.submit && pst.randcheck == req.session.rand){
         if(check.nameErr==""&&check.passErr==""&&check.emailErr==""){
             let enc = help.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|");
-            let tkn = crypto.randomBytes(18).toString('hex');
+            let tkn = help.createToken();
             req.session.token = tkn;
-            await users.users_Model.create({ 
-                name: check.name, 
-                password: enc, 
-                email:check.email,
-                token:tkn
-            });
+            await users.createUser(check.name,enc,check.email,tkn);
             res.redirect("/");
             help.createPfp(check.name);
             return;

@@ -8,27 +8,93 @@
     width: var(--width);
     height: var(--height);
 }
+
 .colChoo{
-    position: absolute;
-    width:15%;
-    top:300px;
+    width:100%;
+}
+.canv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+canvas{
+    border: black 2px solid;
 }
 #color{
     width: 100%;
     height: 100%;
-    position: absolute;
 }
-a{
-    top: 400px;
-    position: relative;
+.sel{
+    background-color: #0000004f;
+}
+#bucket{
+    background-image: url("./img/bucket.svg");
+}
+
+.toolBox{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+    justify-content: space-around;
+}
+.tIcon{
+    flex: 1 0 auto;
+    height:auto;
+    /* background-position:4px -9px; */
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     border: 3px solid black;
+}
+.tIcon::before{
+    content:'';
+    float:left;
+    padding-top:100%;
+    
+}
+#pencil{
+    background-image: url("./img/pencil.svg");
+}
+#moveView{
+    background-image: url("./img/moveView.svg");
 }
 .overlay {
   position: fixed;
-  width: 35%;
-  height: 40%;
+  width: 5vh;
+  height: 5vh;
   z-index: 2;
   background-image: url('./img/cursor.png');
-  background-size: 6%;
+  background-size: 5vh;
   background-repeat: no-repeat;
+}
+.hidden{
+    visibility: hidden;
+}
+
+.controlP{
+    -webkit-user-select: none; /* https://www.w3schools.com/howto/howto_css_disable_text_selection.asp */
+    -ms-user-select: none;
+    user-select: none;
+
+    z-index: 100000;
+    position: fixed;
+    padding: 25px;
+    padding-top: 10px;
+    background-color: rgba(0, 0, 0, 0.105);
+    border: 4px solid gray;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: 20px solid gray;
+}
+body{
+    overflow: clip;
 }

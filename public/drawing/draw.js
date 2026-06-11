@@ -1,89 +1,335 @@
 let mouseX, mouseY;
 let mousePressed = false;
 let color = "#ff0000ff";
-let tool = "pen";
+let tool = "pencil";
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 let size = 2;
 const webSocket = new WebSocket(`ws://192.168.1.38:3300/${window.location.pathname}`);
+let connected = false;
 webSocket.onopen = function(event) {
   console.log("WebSocket connection established");
+  connected = true;
 };
 let drawers = [];
+let req;
+let tolerance = 0.1;
+let sliderMoving = false;
 webSocket.onmessage = async function(e) {
-  let d = JSON.parse(e.data);
-  if(!drawers.includes(d.usr)){
-    drawers.push(d.usr);
-    let para = document.createElement("div");
-    let node = document.createTextNode("");
-    para.setAttribute("class","overlay");
-    para.setAttribute("id",d.usr);
-    para.appendChild(node);
-    document.body.appendChild(para);
-  }
-  let usrEl = document.getElementById(d.usr);
-  
-  if (d.held) {
-    if (d.tool == "pen") {
-      let x1 = usrEl.left.replace("px",""), 
-      y1 = usrEl.top.replace("px",""),
-      x2 = d.X,
-      y2 = d.Y;
-      drawLine(x1,y1,x2,y2);
+  if(e.data.includes("getName")){
+    req = e.data.replace("getName","");
+    sendCommand(JSON.stringify({
+      "req":req,
+      "usr":sessionStorage.getItem("name"),
+      "path":window.location.pathname
+    }));
+  } else {
+    let d = JSON.parse(e.data);
+    if(d.usr==sessionStorage.getItem("name")){
+      return;
     }
-    console.log(d.tool,)
-    if (d.tool == "bucket") {
-      bucket(color, d.X, d.Y);
+    if(!drawers.includes(d.usr)){
+      drawers.push(d.usr);
+      let para = document.createElement("div");
+      let node = document.createTextNode("");
+      para.setAttribute("class","overlay");
+      para.setAttribute("id",d.usr);
+      para.appendChild(node);
+      document.body.appendChild(para);
     }
+    let canvas = document.getElementsByTagName("canvas")[0];
+    let b = canvas.getBoundingClientRect();
+    let usrEl = document.getElementById(d.usr);
+    if(d.held=="mobile"){
+      usrEl.dataset.mobile = "store";
+      
+      
+    } else if (d.held&&usrEl.left) {
+      if (d.tool == "pencil") {
+        if(usrEl.dataset.mobile=="store"){
+          usrEl.left = `${d.X}px`
+          usrEl.top = `${d.Y}px`
+          usrEl.dataset.mobile="";
+        }
+        let x1 = usrEl.left.replace("px",""), 
+        y1 = usrEl.top.replace("px",""),
+        x2 = d.X,
+        y2 = d.Y;
+        drawLine(x1,y1,x2,y2,d.color,d.size);
+      }
+      if (d.tool == "bucket") {
+        let canvas = document.getElementsByTagName("canvas")[0];
+        let bounding = canvas.getBoundingClientRect();
+        let xOff = d.X + Math.floor(bounding.left);
+        let yOff = d.Y + Math.floor(bounding.top);
+        bucket(d.color, Math.floor(xOff), Math.floor(yOff));
+      }
+    }
+    if(d.held!="mobile"){
+      usrEl.setAttribute("style",`left: ${d.X+b.left}px;top:${d.Y+b.top}px`);
+    }
+    
+    usrEl.left = `${d.X}px`
+    usrEl.top = `${d.Y}px`
+    
+    console.log(e.data);
   }
-  usrEl.setAttribute("style",`left: ${d.X}px;top:${d.Y}px`);
-  usrEl.left = `${d.X}px`
-  usrEl.top = `${d.Y}px`
-  
-  console.log(e.data);
 }
 function sendCommand(command) {
-  webSocket.send(command);
+  if(connected){
+    webSocket.send(command);
+  }
 }
-window.addEventListener('load', async function () {
-  let canvas = document.getElementsByTagName("canvas")[0];
-  let ctx = canvas.getContext('2d');
-  let img = new Image;
-  img.onload = function(){
-    ctx.drawImage(img,0,0); // Or at whatever offset you like
-  };
-  img.src = "data:image/png;base64,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";
-  
-  let wh = canvas.getBoundingClientRect();
-  canvas.setAttribute("width",wh.width);
-  canvas.setAttribute("height",wh.height);
-  color = document.getElementsByClassName("colChoo")[0].value;
+let isMobile = false;
+let moving = false;
 
+var touchDevice = ('ontouchstart' in document.documentElement);
+window.addEventListener('load', async function () {
+
+  color = document.getElementsByClassName("colChoo")[0].value;
+  document.getElementById("pencil").classList.add("sel");
   document.getElementById("lol").onchange = function(e) {
     color = e.target.value;
     if(color.length==7){
       color += "ff";
     }
-    // color = Buffer.from(color.replace("#",""), 'hex');
+
     console.log(color)
   }
-  document.getElementById("lmao").onclick = function(e) {
-    tool = "pen";
+  let tools = document.getElementsByClassName("tIcon");
+  for(let i =0;i<tools.length;i++){
+    tools[i].onclick = function(e) {
+      mousePressed = false;
+      document.getElementById(tool).classList.remove("sel");
+      tool = e.target.id;
+      e.target.classList.add("sel");
+      let num = document.getElementById("num");
+      let slider = document.getElementById("toolOption");
+      let inpStr = '<input type="number" value="2" id="num">';
+      if(e.target.id=="bucket"){
+        num.parentElement.innerHTML="Sensitivity "+inpStr;
+        num = document.getElementById("num");
+        console.log(tolerance*100);
+        num.value=tolerance*100;
+        slider.value=tolerance*100;
+        slider.max=20;
+        slider.min=0;
+        num.style.width = ((num.value.toString().length + 5 ) * 8) + 'px';
+      }
+      if(e.target.id=="pencil"){
+        num.parentElement.innerHTML="Pencil size "+inpStr;
+        num = document.getElementById("num");
+        num.value=size;
+        slider.value=size;
+        slider.min=1;
+        slider.max=100;
+        num.style.width = ((num.value.toString().length + 5 ) * 8) + 'px';
+      }
+    }
   }
-  document.getElementById("margara").onclick = function(e) {
-    tool = "bucket";
-  }
-  document.addEventListener('keyup', function(event) {
-    if(event.key=="b"){
+  document.addEventListener('keyup', function(e) {
+    if(e.key=="b"){
       tool="bucket";
     }
-    if(event.key=="p"){
-      tool="pen";
+    if(e.key=="p"){
+      tool="pencil";
+    }
+    if(e.key=="m"){
+      tool="moveView";
     }
   });
+  let wC = document.getElementById("num");
+  wC.style.width = ((wC.value.toString().length + 5) * 8) + 'px';
+  wC.addEventListener("input",function(){
+    this.style.width = ((this.value.toString().length + 5 ) * 8) + 'px';
+    size=this.value;
+  });
+  let slider = document.getElementById("toolOption");
+  slider.value = wC.value;
+  size=wC.value;
+  slider.addEventListener("input",function(e){
+    let wC = document.getElementById("num");
+    wC.value=e.target.value;
+    if(tool=="pencil"){
+      size=e.target.value;
+    }
+    if(tool=="bucket"){
+      tolerance=parseFloat((e.target.value/100).toFixed(2));
+    }
+    sliderMoving = true;
+  });
+  fetch(window.location.href+'/data')
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+    sessionStorage.setItem("name",data.name);
+    sessionStorage.setItem("token",data.token);
+    sessionStorage.setItem("width",data.width);
+    sessionStorage.setItem("height",data.height);
+    let canvas = document.getElementsByTagName("canvas")[0];
+    let ctx = canvas.getContext('2d');
+    let img = new Image;
+    img.onload = function(){
+      ctx.drawImage(img,0,0);
+    };
+    let imgDat = document.getElementById("imgData");
+    img.src = imgDat.innerHTML;
+    imgDat.remove();
+    let wh = canvas.getBoundingClientRect();
+    canvas.setAttribute("width",sessionStorage.getItem("width"));
+    canvas.setAttribute("height",sessionStorage.getItem("height"));
+    console.log(canvas.getAttribute("width"),sessionStorage.getItem("width"));
+    let cDiv = document.getElementById("color");
+    if(cDiv.getBoundingClientRect().width<canvas.getAttribute("width")){
+      cDiv.classList.remove("canv");
+    }
+  });
+  
+  
+  
+  if(!touchDevice){
+    onmousemove = async function (e) {
+      mvCurs(e.clientX,e.clientY,mouseX,mouseY);
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+    document.getElementById("moveable").addEventListener("mousedown", async function(){
+      moving=true;
+      await move(this);
+      moving=false;
+    });
+    onmousedown = event => {
+      if (event.defaultPrevented) {
+        return;
+      }
+    
+      if (event.button == 0&&!moving) {
+        if (tool == "pencil"||tool=="moveView") {
+          mousePressed = true;
+        }
+        if (tool == "bucket"&&!movePressed) {
+          bucket(color, mouseX, mouseY);
+        }
+      }
+      console.log(event.button);
+      
+    };
+    onmouseup = event => {
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (event.button == 0) {
+        mousePressed = false;
+        sliderMoving = false;
+        movePressed = false;
+      }
+    };
+    document.addEventListener('wheel', function (event) {
+      if (tool == "pencil") {
+        if (event.deltaY > 0) {
+          if (size > 1) {
+            size--;
+          }
+        } else {
+          size++;
+        }
+      }
+    });
+  } else {
+    document.getElementsByClassName("canv")[0].style.justifyContent="normal";
+    document.body.addEventListener("touchstart", (e) => {
+      // document.getElementById("bbbb").innerHTML = `touch ${Math.random()}`;
+      mouseX = e.touches[0].clientX;
+      mouseY = e.touches[0].clientY;
+      if(!moving){
+        mousePressed = true;
+      } else {
+        mousePressed = false;
+      }
+      
+    });
+
+    document.body.addEventListener("touchend", async (e) => {
+      let curX = e.changedTouches[0].clientX;
+      let curY = e.changedTouches[0].clientY;
+      mvCurs(curX,curY,mouseX,mouseY);
+      mouseX = curX;
+      mouseY = curY;
+      sendData(curX,curY,"mobile",tool);
+      if (tool == "bucket"&&!movePressed) {
+        bucket(color, mouseX, mouseY);
+      }
+      mousePressed = false;
+      movePressed = false;
+    });
+    document.body.addEventListener("touchmove", (e) => {
+      mvCurs(e.touches[0].clientX,e.touches[0].clientY,mouseX,mouseY);
+      mouseX = e.touches[0].clientX;
+      mouseY = e.touches[0].clientY;
+    });
+    function preventDefault(e) {
+      if(tool!="moveView"||moving){
+        e.preventDefault();
+      }
+    }
+    var supportsPassive = false;
+    try {
+      window.addEventListener("test", null, Object.defineProperty({}, 'passive', {
+        get: function () { supportsPassive = true; } 
+      }));
+    } catch(e) {}
+    var wheelOpt = supportsPassive ? { passive: false } : false;
+    window.addEventListener('touchmove', preventDefault, wheelOpt);
+    document.getElementById("moveable").addEventListener("touchstart", async function(e){
+      mouseX = e.touches[0].clientX;
+      mouseY = e.touches[0].clientY;
+      moving=true;
+      
+      await move(this);
+      moving=false;
+    });
+  }
+  
+  window.addEventListener("beforeunload", (event) => { 
+    sendCommand(JSON.stringify({
+      "unload":req,
+      "path":window.location.pathname
+    }));
+    saveImage();
+  });
+
 });
-function drawLine(x1,y1,x2,y2){
+let movePressed = false;
+function getOffset(el) {
+  const rect = el.getBoundingClientRect();
+  return {
+    left: rect.left + window.scrollX,
+    top: rect.top + window.scrollY
+  };
+}
+async function move(el){
+    el.classList.add("hidden");
+    let off1 = getOffset(el);
+    let offY = off1["top"];
+    let offX = off1["left"];
+    movePressed = true;
+    el.style.top = mouseY-offY+"px";
+    el.style.left = mouseX-offX+"px";
+    let off2 = getOffset(el);
+    let offY1 = off1["top"]-off2["top"];
+    let offX1 = off1["left"]-off2["left"];
+    while(movePressed&&!sliderMoving){
+      el.style.top = (mouseY-offY+offY1)+"px";
+      el.style.left = (mouseX-offX+offX1)+"px";
+      if (el.classList[1] == "hidden" || el.classList[2] == "hidden"){
+        el.classList.remove("hidden");
+      }
+      await sleep(40);
+    }
+}
+function drawLine(x1,y1,x2,y2,color,size){
   let canvas = document.getElementsByTagName("canvas")[0];
   let ctx = canvas.getContext("2d");
   ctx.beginPath();
@@ -93,88 +339,51 @@ function drawLine(x1,y1,x2,y2){
   ctx.lineWidth = size;
   ctx.stroke();
 }
-onmousemove = async function (e) {
-  if (mousePressed) {
-    let x1 = mouseX, 
-    y1 = mouseY,
-    x2 = e.clientX,
-    y2 = e.clientY;
-    drawLine(x1,y1,x2,y2);
-  }
-  document.getElementById("bbbb").innerHTML = `X: ${e.clientX} Y: ${e.clientY}`;
-  sendCommand(JSON.stringify({
-    "X":e.clientX,
-    "Y":e.clientY,
-    "usr":sessionStorage.getItem("name"),
-    "path":window.location.pathname,
-    "held":mousePressed,
-    "tool":tool
-  }));
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-};
-onmousedown = event => {
-  if (event.defaultPrevented) {
-    return;
-  }
-  if (event.button == 0) {
-    if (tool == "pen") {
-      mousePressed = true;
-      sendCommand(JSON.stringify({
-        "X":mouseX,
-        "Y":mouseY,
-        "usr":sessionStorage.getItem("name"),
-        "path":window.location.pathname,
-        "held":mousePressed,
-        "tool":tool
-      }));
-      createPixel(size, mouseX, mouseY, color);
+
+
+function mvCurs(X,Y,tX,tY){
+  let canvas = document.getElementsByTagName("canvas")[0];
+  let b = canvas.getBoundingClientRect();
+  if (mousePressed&&!moving) {
+    let x1 = tX-b.left, 
+    y1 = tY-b.top,
+    x2 = X-b.left,
+    y2 = Y-b.top;
+    if(tool=="pencil"){
+      drawLine(x1,y1,x2,y2,color,size);
     }
-    if (tool == "bucket") {
-      sendCommand(JSON.stringify({
-        "X":mouseX,
-        "Y":mouseY,
-        "usr":sessionStorage.getItem("name"),
-        "path":window.location.pathname,
-        "held":true,
-        "tool":tool
-      }));
-      bucket(color, mouseX, mouseY);
-    }
-  }
-  console.log(event.button);
-  if (event.button == 2) {
-    if (tool == "bucket") {
-      tool = "pen";
-    }
-  }
-  if (event.button == 1) {
-    if (tool == "pen") {
-      tool = "bucket";
-    }
-  }
-};
-onmouseup = event => {
-  if (event.defaultPrevented) {
-    return;
-  }
-  if (event.button == 0) {
-    if (tool == "pen") {
-      mousePressed = false;
-    }
-  }
-};
-document.addEventListener('wheel', function (event) {
-  if (tool == "pen") {
-    if (event.deltaY > 0) {
-      if (size > 1) {
-        size--;
+    if(tool=="moveView"){
+      if(!isMobile){
+        window.scrollBy((x1-x2)*4,(y1-y2)*4);
+      } else {
+        window.scrollBy((x1-x2),(y1-y2));
       }
-    } else {
-      size++;
+      
     }
+    
   }
-});
+  document.getElementById("bbbb").innerHTML = `X: ${X-b.left} Y: ${Y-b.top} ${tool} ${mousePressed}`;
+  sendData(X-b.left,Y-b.top,mousePressed,tool);
+}
+
+
+function sendData(X,Y,held,tool){
+
+  sendCommand(JSON.stringify({
+    "X":X,
+    "Y":Y,
+    "usr":sessionStorage.getItem("name"),
+    "tkn":sessionStorage.getItem("token"),
+    "path":window.location.pathname,
+    "held":held,
+    "tool":tool,
+    "color":color,
+    "size":size
+  }));
+  
+  
+}
+
 
 
 let changeD = false;
@@ -192,12 +401,14 @@ async function createPixel(size, posX, posY, color) {
     if(a.length==1){a+="0";}
     color = "#"+r+g+b+a;
   }
-
+  
   if(size.constructor==Object){
     ctx.fillStyle = color;
     ctx.fillRect(posX,posY,size["x"],size["y"]);
 
   } else {
+
+    // console.log(posX,posY,color);
     ctx.fillStyle = color;
     ctx.fillRect(posX,posY,size,size);
 
@@ -210,82 +421,109 @@ let data1 = [];
 let wh = [];
 
 function calcPixel(x,y,width){
-  return ((x))+(((y)*((width))));
+  if(x>=0&&y>=0){
+    return ((x))+(((y)*((width))));
+  }
+  
 }
-function colorCheck(x,y,width,clckCol,px){
-  return JSON.stringify(clckCol) == JSON.stringify(px[calcPixel(x,y,width)]);
+function colorCheck(x,y,width,clckCol,px,tolerance){
+  if(y<0){console.log(y);return false;}
+  return diffCheck(clckCol,px[calcPixel(x,y,width)]) < tolerance;
 }
-
-async function bucket(color, x1, y1) {
+function colToArr(stn){
+  return [
+    parseInt(stn.slice(1,3),16),
+    parseInt(stn.slice(3,5),16),
+    parseInt(stn.slice(5,7),16),
+    parseInt(stn.slice(7,9),16)
+  ]
+}
+async function bucket(color, X, Y) {
+  console.log(X,Y)
   const before = performance.now();
   if(color.length==7){
     color += "ff";
   }
-  if(color.length!=4){
-    // color = Buffer.from(color.replace("#",""), 'hex');
-  }
   let canvas = document.getElementsByTagName("canvas")[0];
+  let ctx = canvas.getContext("2d");
   let bounding = canvas.getBoundingClientRect();
-  let x = x1 - bounding.left;
-  let y = y1 - bounding.top;
-  let width = bounding.width;
-  let height = bounding.height;
-  console.log(x,y,"coords");
+  let xOff = X - Math.floor(bounding.left);
+  let yOff = Y - Math.floor(bounding.top);
+  let width = canvas.width;
+  let height = canvas.height;
   let pixels = [];
-  data1 = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
+  data1 = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
   for (let i = 0; i < data1.length; i += 4) {
     pixels.push([data1[i],data1[i + 1],data1[i + 2],data1[i + 3]]);
   }
-  let curCol = pixels[calcPixel(x,y,width)];
-  if (!colorCheck(x,y,width,curCol,pixels)){
+  let curCol = pixels[calcPixel(xOff,yOff,width)];
+
+  if (!colorCheck(xOff,yOff,width,curCol,pixels,tolerance)){
     return;
   }
-  let s = [[x,x,y,1],[x,x,y-1,-1]];
-  let drawAble = [];
-  
-  while(s.length!=0){
-    let pos = s.pop();
-    let x1=pos[0];
-    let x2=pos[1];
-    let y=pos[2];
-    let dy=pos[3];
-    let x = x1;
-    let row=[];
-    if(colorCheck(x,y,width,curCol,pixels)){
-      while (colorCheck(x-1,y,width,curCol,pixels)){
-        // createPixel(1,x-1,y,"red");
-        row.push(x-1);
-        pixels[calcPixel(x-1,y,width)] = [255,0,0,255];
-        x--;
-        if(x<x1){
-          s.push([x,x1-1,y-dy,-dy]);
+  let colArr = colToArr(color);
+  let Q = [{x:xOff,y:yOff}];
+  let delay=0;
+  while(Q.length>0){
+    delay++;
+    if(delay>(((width*height*100)/Q.length))){
+      delay=0;
+      await sleep(40);
+    }
+    let n = Q[0];
+    Q = Q.slice(1);
+    if(colorCheck(n.x,n.y,width,curCol,pixels,tolerance)){
+      pixels[calcPixel(n.x,n.y,width)] = colArr;
+      createPixel(1,n.x,n.y,color);
+      Q.push(
+        {
+          x:n.x-1,
+          y:n.y
+        },
+        {
+          x:n.x+1,
+          y:n.y
+        },
+        {
+          x:n.x,
+          y:n.y-1
+        },
+        {
+          x:n.x,
+          y:n.y+1
         }
-      }
+      )
     }
-    while(x1<=x2){
-      while (colorCheck(x1,y,width,curCol,pixels)){
-        // createPixel(1,x1,y,"red");
-        row.push(x1);
-        pixels[calcPixel(x1,y,width)] = [255,0,0,255];
-        x1++;
-      }
-      if(x1>x){
-        s.push([x,x1-1,y+dy,dy]);
-      }
-      if(x1-1>x2){
-        s.push([x2+1,x1-1,y-dy,-dy]);
-      }
-      x1++;
-      while(x1<=x2 && !colorCheck(x1,y,width,curCol,pixels)){
-        x1++;
-      }
-      x=x1;
-    }
-    await sleep(100);
-    drawLine(Math.min.apply(Math,row),y,Math.max.apply(Math,row)+1,y);
   }
-  console.log(performance.now()-before,curCol,x);
+  console.log(performance.now()-before,curCol);
   return;
   
+}
+function diffCheck(col1,col2){
+  if(col1&&col2){
+    // https://en.wikipedia.org/wiki/Color_difference
+    let rAvg = (col1[0]+col2[0])/2;
+    let dR=(col1[0]-col2[0])**2;
+    let dG=(col1[1]-col2[1])**2;
+    let dB=(col1[2]-col2[2])**2;
+    let dC=Math.sqrt(((2+(rAvg/256))*dR)+(4*dG)+((2+((255-rAvg)/256))*dB));
+    return (dC/1529)+(Math.abs(col1[3]-col2[3]))/255;
+  }
+  
+}
+var download = function(el){
+  var link = document.createElement('a');
+  link.download = 'filename.png';
+  link.href = el.toDataURL()
+  link.click();
+}
+function saveImage(){
+  sendCommand(JSON.stringify({
+    "path":window.location.pathname,
+    "tkn":sessionStorage.getItem("token"),
+    "usr":sessionStorage.getItem("name"),
+    "save":true,
+    "dUrl":document.getElementsByTagName("canvas")[0].toDataURL()
+  }));
 }

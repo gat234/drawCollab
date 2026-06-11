@@ -1,0 +1,10 @@
+.form-signin{
+    max-width: 25vw;
+    padding: 1rem;
+}
+.hidden{
+    visibility: hidden;
+}
+.error{
+    color:red;
+}

