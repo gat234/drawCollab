@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/gat234/drawCollab#readme",
   "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.48",
     "body-parser": "^2.2.2",
     "canvas": "^3.2.3",
     "crypto": "^1.0.1",
