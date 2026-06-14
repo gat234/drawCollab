@@ -27,6 +27,7 @@
     "express-session": "^1.19.0",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
+    "sequelize": "^6.37.8",
     "websocket": "^1.0.35"
   }
 }
