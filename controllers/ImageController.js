@@ -4,7 +4,7 @@ let crypto = require("crypto");
 const path = require('path');
 const canvas = require("canvas");
 let prep = require('../helpers/tempFunc.mjs');
-let rand = require('../helpers/encrFunc.mjs');
+let ran = require('../helpers/encrFunc.mjs');
 let val = require('../helpers/checkInpFunc.mjs');
 exports.imageView=async (req,res,next)=>{
     let img = await images.getImgByUrl(req.params.location,["name","width","height"]);
@@ -81,7 +81,7 @@ exports.open=async (req,res,next)=>{
                         ctx.drawImage(img,0,0);
                     })
                 } catch {
-                    c = ""
+                    
                 }
                 
                 let render = await prep.prepareHeader(req.session.token);
@@ -139,7 +139,7 @@ exports.newImage = async (req,res,next)=>{
             res.redirect("./image/"+newURL);
             return;
         } else {
-            let r = rand.rand(15);
+            let r = ran.rand(15);
             req.session.rand = r;
             res.render('img/new_img', { 
                 self: req.originalUrl, 

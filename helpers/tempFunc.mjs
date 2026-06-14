@@ -1,6 +1,6 @@
 import {checkToken} from '../models/users.mjs';
 import {getImages,getUsersImg} from '../models/image.mjs';
-
+import {getImgData} from './imageFunc.mjs'
 
 
 export async function prepareHeader(tkn){

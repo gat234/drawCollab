@@ -1,4 +1,4 @@
-const webSocket = new WebSocket(`ws://192.168.1.38:3300/${window.location.pathname}`);
+const webSocket = new WebSocket(`ws://127.0.0.1:3300/${window.location.pathname}`);
 let connected = false;
 webSocket.onopen = function(event) {
   console.log("WebSocket connection established");

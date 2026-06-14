@@ -20,15 +20,19 @@
   "homepage": "https://github.com/gat234/drawCollab#readme",
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.48",
+    "@sequelize/mysql": "^7.0.0-alpha.48",
     "body-parser": "^2.2.2",
     "canvas": "^3.2.3",
     "crypto": "^1.0.1",
     "ejs": "^6.0.1",
+    "email-validator": "^2.0.4",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "fs": "^0.0.1-security",
+    "multer": "^2.1.1",
     "path": "^0.12.7",
     "sequelize": "^6.37.8",
-    "websocket": "^1.0.35"
+    "websocket": "^1.0.35",
+    "ws": "^8.21.0"
   }
 }
