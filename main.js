@@ -25,6 +25,8 @@ app.listen(PORT, () => {
     console.log(`Server Established at PORT -> ${PORT}`);
 });
 app.use( ( req, res, next ) => {
-    let getH = prep.prepareHeader(req.session.token);
+    let lan = req.session.lan;
+    if (!req.session.lan){lan="EN"}
+    let getH = prep.prepareHeader(req.session.token,lan);
     res.status( 404 ).render('404', getH);
 });

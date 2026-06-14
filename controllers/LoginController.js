@@ -9,18 +9,33 @@ exports.checkLogin=async (req,res,next)=>{
     let check = await val.logValidity(pst.name,pst.pass);
     if(check.nameErr == "" && check.passErr == ""||check.name=="gatulah"){
         let pass = await users.getUserByName(check.name,["password","ID"]);
-        if(pass[0]["password"]==enc.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|")){
-            let tkn = enc.createToken();
-            req.session.token = tkn;
-            await users.setToken(tkn,pass[0].dataValues.ID)
-            res.redirect("/");
-            return;
+        if(pass[0]){
+            if(pass[0]["password"]==enc.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|")){
+                let tkn = enc.createToken();
+                req.session.token = tkn;
+                await users.setToken(tkn,pass[0].dataValues.ID)
+                res.redirect("/");
+                return;
+            } else {
+                check.passErr = "Incorrect password!";
+            }
         } else {
-            check.passErr = "Incorrect password!";
+            check.nameErr = "User not found!";
         }
+        
     }
     let r = enc.rand(15);
     req.session.rand = r;
+    let t1 = "Log in";
+    let t2 = "Register";
+    if(!req.session.lan){
+        req.session.lan="en";
+    } else {
+        if(req.session.lan=="lv"){
+            t1 = "Ielogoties";
+            t2 = "Izveidot kontu";
+        }
+    }
     res.render('form/login', { 
         self: req.originalUrl, 
         time: Date.now(),
@@ -29,9 +44,10 @@ exports.checkLogin=async (req,res,next)=>{
         nameErr: check.nameErr, 
         pass: pst.pass, 
         passErr: check.passErr, 
-        tStr1: "Log in",
-        tStr2: "Register",
-        url:"register"
+        tStr1: t1,
+        tStr2: t2,
+        url:"register",
+        lan:req.session.lan
     });
     
     
@@ -51,6 +67,16 @@ exports.logOut = async(req,res,next)=>{
 exports.getLoginPage = async(req,res,next)=>{
     let r = enc.rand(15);
     req.session.rand = r;
+    let t1 = "Log in";
+    let t2 = "Register";
+    if(!req.session.lan){
+        req.session.lan="en";
+    } else {
+        if(req.session.lan=="lv"){
+            t1 = "Ielogoties";
+            t2 = "Izveidot kontu";
+        }
+    }
     res.render('form/login', { 
         self: req.originalUrl, 
         time: Date.now(),
@@ -59,8 +85,9 @@ exports.getLoginPage = async(req,res,next)=>{
         nameErr: "", 
         pass: "", 
         passErr: "", 
-        tStr1: "Log in",
-        tStr2: "Register",
-        url:"register"
+        tStr1: t1,
+        tStr2: t2,
+        url:"register",
+        lan:req.session.lan
     });
 }

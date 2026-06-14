@@ -1,14 +1,44 @@
 <%- include('../partial/form-partial-t.ejs',{title:"Register"}) %>
-        <h1 class="h3 mb-3 fw-normal text-center">Create account</h1>
+        <h1 class="h3 mb-3 fw-normal text-center">
+          <% if (lan=="lv") { %>
+          Izveidot kontu
+          <% } else { %>
+          Create an account
+          <% } %>
+        </h1>
         <input type="hidden" value="<%=rand%>" name="randcheck" />
         <div class="form-floating">
-          <input type="text" name="name" value="<%=name%>" class="form-control" id="floatingInput" placeholder="Username">
-          <label for="floatingInput">Username</label>
+          <input type="text" name="name" value="<%=name%>" class="form-control" id="floatingInput" placeholder="
+          <% if (lan=="lv") { %>
+          Vārds
+          <% } else { %>
+          Username
+          <% } %>
+          ">
+          <label for="floatingInput">
+            <% if (lan=="lv") { %>
+            Vārds
+            <% } else { %>
+            Username
+            <% } %>
+          </label>
           <span class="error"><%=nameErr%></span>
         </div>
         <div class="form-floating">
-          <input type="text" name="email" value="<%=email%>" class="form-control" id="floatingEmail" placeholder="Email">
-          <label for="floatingEmail">Email</label>
+          <input type="text" name="email" value="<%=email%>" class="form-control" id="floatingEmail" placeholder="
+          <% if (lan=="lv") { %>
+          Epasts
+          <% } else { %>
+          Email
+          <% } %>
+          ">
+          <label for="floatingEmail">
+            <% if (lan=="lv") { %>
+            Epasts
+            <% } else { %>
+            Email
+            <% } %>
+          </label>
           <span class="error"><%=emailErr%></span>
         </div>
-<%- include('../partial/form-partial-b.ejs') %>
+<%- include('../partial/form-partial-b.ejs',{lan:lan}) %>

@@ -21,6 +21,16 @@ exports.Register=async (req,res,next)=>{
 
     let r = enc.rand(15);
     req.session.rand = r;
+    let t1 = "Create";
+    let t2 = "Log in";
+    if(!req.session.lan){
+        req.session.lan="en";
+    } else {
+        if(req.session.lan=="lv"){
+            t1 = "Izveidot kontu";
+            t2 = "Ielogoties";
+        }
+    }
     res.render('form/register', { 
         self: req.originalUrl, 
         time: Date.now(),
@@ -31,14 +41,25 @@ exports.Register=async (req,res,next)=>{
         passErr: check.passErr, 
         email: pst.email, 
         emailErr: check.emailErr,
-        tStr1: "Create",
-        tStr2: "Log in",
-        url:"login"
+        tStr1: t1,
+        tStr2: t2,
+        url:"login",
+        lan:req.session.lan
     });
 };
 exports.getRegisterPage = async (req,res)=>{
     let r = enc.rand(15);
     req.session.rand = r;
+    let t1 = "Create";
+    let t2 = "Log in";
+    if(!req.session.lan){
+        req.session.lan="en";
+    } else {
+        if(req.session.lan=="lv"){
+            t1 = "Izveidot kontu";
+            t2 = "Ielogoties";
+        }
+    }
     res.render('form/register', { 
         self: req.originalUrl, 
         time: Date.now(),
@@ -49,8 +70,9 @@ exports.getRegisterPage = async (req,res)=>{
         passErr: "", 
         email: "", 
         emailErr: "",
-        tStr1: "Create",
-        tStr2: "Log in",
-        url:"login"
+        tStr1: t1,
+        tStr2: t2,
+        url:"login",
+        lan:req.session.lan
     });
 };

@@ -90,6 +90,16 @@ export async function setToken(tkn,id){
   );
   return res;
 }
+export async function deleteAccount(id){
+  let res = await Users.destroy(
+    {
+      where:{
+          ID:id
+      }
+    }
+  );
+  return res;
+}
 export async function setName(nam,id){
   let res = await Users.update(
     {

@@ -8,7 +8,9 @@ exports.openProfile = async (req,res)=>{
         let usrID = await users.checkToken(req.session.token,["ID"]);
         if(usrID[0]){
             usrID = usrID[0].dataValues.ID;
-            let tempData = await dat.getProfileTemplate(usrID,req.session.token);
+            let lan = req.session.lan;
+            if (!req.session.lan){lan="EN"}
+            let tempData = await dat.getProfileTemplate(usrID,req.session.token,lan);
             res.render('profile/profile', tempData);
         }
     } else {
@@ -20,7 +22,9 @@ exports.changeImgUsr = async (req,res)=>{
         let usrID = await users.checkToken(req.session.token,["ID","name"]);
         if(usrID[0]){
             usrID = usrID[0].dataValues;
-            let tempData = await dat.getProfileTemplate(usrID.ID,req.session.token);
+            let lan = req.session.lan;
+            if (!req.session.lan){lan="EN"}
+            let tempData = await dat.getProfileTemplate(usrID.ID,req.session.token,lan);
             let pst = req.body;
             let check = await val.imgUsrValidity(pst.usrName,pst.imgUrl);
             if(check.nameErr==""){
@@ -39,5 +43,25 @@ exports.changeImgUsr = async (req,res)=>{
         }
     } else {
         res.redirect("/");
+    }
+}
+exports.changeLan = async (req,res)=>{
+    if(req.params.language=="lv"){
+        req.session.lan = "lv";
+        
+    } else {
+        req.session.lan = "en";
+    }
+    req.session.save();
+}
+exports.deleteAcc = async (req,res)=>{
+    if(req.session.token){
+        let usrID = await users.checkToken(req.session.token,["ID","name"]);
+        if(usrID[0]){
+            await users.deleteAccount(usrID[0].dataValues.ID);
+            req.session.token = "";
+            req.session.save();
+            res.redirect("/")
+        }
     }
 }

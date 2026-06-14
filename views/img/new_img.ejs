@@ -1,27 +1,93 @@
 <%- include('../partial/form-partial-t.ejs',{title:"Create image"}) %>
-        <h1 class="h3 mb-3 fw-normal">New image</h1>
+        <h1 class="h3 mb-3 fw-normal">
+          <% if (lan=="lv") { %>
+          Jauna bilde
+          <% } else { %>
+          New image
+          <% } %>
+        </h1>
         <input type="hidden" value="<%=rand%>" name="randcheck" />
         <div class="input-group">
-            <span class="input-group-text">Width</span>
+            <span class="input-group-text">
+              <% if (lan=="lv") { %>
+              Platums
+              <% } else { %>
+              Width
+              <% } %>
+            </span>
             <input type="text" name="width" class="form-control" value="<%=width%>">
             <span class="error"><%=widthErr%></span>
-            <span class="input-group-text">Height</span>
+            <span class="input-group-text">
+              <% if (lan=="lv") { %>
+              Garums
+              <% } else { %>
+              Height
+              <% } %>
+            </span>
             <input type="text" name="height" class="form-control" value="<%=height%>">
             <span class="error"><%=heightErr%></span>
         </div>
-        <select class="form-select" name="visibility">
-            <option value="0">Public</option>
-            <option value="1">Unlisted</option>
-            <option value="2">Restricted</option>
-            <option value="3">Private</option>
+        <select class="form-select" name="
+        <% if (lan=="lv") { %>
+        Redzamība:
+        <% } else { %>
+        Visibility:
+        <% } %>
+        ">
+            <option value="0">
+              <% if (lan=="lv") { %>
+              Publisks
+              <% } else { %>
+              Public
+              <% } %>
+            </option>
+            <option value="1">
+              <% if (lan=="lv") { %>
+              Nerindots
+              <% } else { %>
+              Unlisted
+              <% } %>
+            </option>
+            <option value="2">
+              <% if (lan=="lv") { %>
+              Ierobežots
+              <% } else { %>
+              Restricted
+              <% } %>
+            </option>
+            <option value="3">
+              <% if (lan=="lv") { %>
+              Privāts
+              <% } else { %>
+              Private
+              <% } %>
+            </option>
         </select>
         <div class="form-floating">
-          <input type="text" name="name" value="<%=name%>" class="form-control" id="floatingName" placeholder="Name">
-          <label for="floatingName">Name</label>
+          <input type="text" name="name" value="<%=name%>" class="form-control" id="floatingName" placeholder="
+          <% if (lan=="lv") { %>
+          Nosaukums
+          <% } else { %>
+          Name
+          <% } %>
+          ">
+          <label for="floatingName">
+            <% if (lan=="lv") { %>
+            Nosaukums
+            <% } else { %>
+            Name
+            <% } %>
+          </label>
           <span class="error"><%=nameErr%></span>
         </div>
         <div class="d-flex">
-            <button class="btn btn-primary w-100 py-2" type="submit" name="submit" value="Submit">Submit</button>
+            <button class="btn btn-primary w-100 py-2" type="submit" name="submit" value="Submit">
+              <% if (lan=="lv") { %>
+              Iesūtīt
+              <% } else { %>
+              Submit
+              <% } %>
+            </button>
         </div>
       </form>
     </main>

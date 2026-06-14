@@ -13,18 +13,41 @@
     </script>
     <main class="form-signin w-100 m-auto">
         <form action="./settings" method="post"> 
-            <h1 class="h3 mb-3 fw-normal">Change account details</h1> 
+            <h1 class="h3 mb-3 fw-normal">
+                <% if (lan=="lv") { %>
+                Mainīt kontu
+                <% } else { %>
+                Change account details
+                <% } %>
+                
+            </h1> 
             <div class="form-floating"> 
                 <div class="row g-3 align-items-center">
                     <div class="col-sm-5">
                         <input class="form-check-input" type="checkbox" value="true" id="checkPassword" name="pSet">
                         <label class="form-check-label" for="checkPassword">
+                            <% if (lan=="lv") { %>
+                            Mainīt paroli
+                            <% } else { %>
                             Change password
+                            <% } %>
                         </label>
                     </div>
                     <div class="col-sm hidden" id="pass">
-                        <label for="floatingPassword">Change password</label>
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="New password" 
+                        <label for="floatingPassword">
+                            <% if (lan=="lv") { %>
+                            Mainīt paroli
+                            <% } else { %>
+                            Change password
+                            <% } %>
+                        </label>
+                        <input type="password" class="form-control" id="floatingPassword" placeholder="
+                        <% if (lan=="lv") { %>
+                        Jana parole
+                        <% } else { %>
+                        New password
+                        <% } %>
+                        " 
                         <% if (locals.pass) { %>
                             value="<%=pass%>"
                         <% } %>
@@ -40,12 +63,28 @@
                     <div class="col-sm-5">
                         <input class="form-check-input" type="checkbox" value="true" id="checkName" name="nSet">
                         <label class="form-check-label" for="checkName">
-                            Change name
+                            <% if (lan=="lv") { %>
+                            Mainīt vārdu
+                            <% } else { %>
+                            Change Name
+                            <% } %>
                         </label>
                     </div>
                     <div class="col-sm hidden" id="nam">
-                        <label for="floatingName">Change name</label>
-                        <input type="name" class="form-control" id="floatingName" placeholder="New name" name="name"
+                        <label for="floatingName">
+                            <% if (lan=="lv") { %>
+                            Mainīt vārdu
+                            <% } else { %>
+                            Change Name
+                            <% } %>
+                        </label>
+                        <input type="name" class="form-control" id="floatingName" placeholder="
+                        <% if (lan=="lv") { %>
+                        Jauns vārds
+                        <% } else { %>
+                        New name
+                        <% } %>
+                        " name="name"
                         <% if (locals.name) { %>
                             value="<%=name%>"
                         <% } %>
@@ -54,6 +93,7 @@
                         <span class="error"><%=nameErr%></span>
                         <% } %>
                     </div>
+                    <div></div>
                 </div>
                 
             </div>
@@ -61,7 +101,13 @@
         </form>
         <form method="post" enctype="multipart/form-data" action="./settings/upload/pfp" class="pt-5">
             <div class="mb-3">
-                <h1 class="h3 mb-3 fw-normal">Change profile picture</h1> 
+                <h1 class="h3 mb-3 fw-normal">
+                    <% if (lan=="lv") { %>
+                    Mainīt profila bildi
+                    <% } else { %>
+                    Change profile picture
+                    <% } %>
+                </h1> 
                 <div class="row g-3 align-items-center">
                     <div class="col-sm-3">
                         <img src="<%=pfpUrl%>" alt="usrPFP" width="100" height="100"> 
@@ -71,9 +117,42 @@
                     </div>
                 </div>
                 
-                <button class="btn btn-primary w-100 py-2 mt-3" type="submit">Submit</button>
+                <button class="btn btn-primary w-100 py-2 mt-3" type="submit">
+                    <% if (lan=="lv") { %>
+                    Iesūtīt
+                    <% } else { %>
+                    Submit
+                    <% } %>
+                </button>
             </div>
         </form>
+        <button class="btn btn-danger" onclick='onBTN()'>
+        <% if (lan=="lv") { %>
+        Izdzēst kontu
+        <% } else { %>
+        Delete account
+        <% } %>
+        </button>
     </main>
+    <script>
+        function onBTN(){
+            <% if (lan=="lv") { %>
+            let confTXT = "Vai esi pārliecināts ka vēlies dzēst kontu?"
+            <% } else { %>
+            let confTXT = "Are you sure you want to delete your account?"
+            <% } %>
+            let answ = confirm(confTXT);
+            if(answ){
+                deleteAccount();
+            }
+        }
+        
+        async function deleteAccount(){
+            await fetch("/deleteAccount", {
+                method: "POST"
+            });
+            location.href = "/";
+        }
+    </script>
 </body>
 </html>

@@ -3,8 +3,8 @@ import {getImages,getUsersImg} from '../models/image.mjs';
 import {getImgData} from './imageFunc.mjs'
 
 
-export async function prepareHeader(tkn){
-    let usrHeader = ["Log in", "/login",false,""];
+export async function prepareHeader(tkn,lang){
+    let usrHeader = ["Log in", "/login",false,"","EN"];
     let pfpurl = "/images/default/default.png";
     if(tkn){
         let name = await checkToken(tkn,["name"]);
@@ -15,20 +15,22 @@ export async function prepareHeader(tkn){
         usrHeader[2]=true;
         usrHeader[3]=name;
     }
+    usrHeader[4]=lang;
     return { 
         title: tkn,
         pfpUrl: pfpurl,
         prof_log: usrHeader[0],
         signUrl: usrHeader[1],
         loggedIn:usrHeader[2],
-        name:usrHeader[3]
+        name:usrHeader[3],
+        lan:usrHeader[4]
     }
 }
 
 
-export async function getProfileTemplate(usrID,tkn){
+export async function getProfileTemplate(usrID,tkn,lan){
     let usrImg = await getUsersImg(usrID);
-    let tempData = await prepareHeader(tkn);
+    let tempData = await prepareHeader(tkn,lan);
     tempData.publImg = [];
     if(usrImg[0]){
         let data = await getImages(usrImg);

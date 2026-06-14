@@ -11,10 +11,36 @@
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"> 
                 <% if(!locals.mainCheck){ %>
                     <li>
-                        <a href="../" class="nav-link px-2 link-body-emphasis">Go back</a>
+                        <a href="../" class="nav-link px-2 link-body-emphasis">
+                            <% if (lan=="lv") { %>
+                            Atpakaļ
+                            <% } else { %>
+                            Go back
+                            <% } %>
+                        </a>
                     </li> 
                 <% } %>
-            </ul>  
+            </ul>
+            <div class="dropdown text-end p-2"> 
+                <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
+                    <% if (lan=="lv") { %>
+                    Valoda
+                    <% } else { %>
+                    Language
+                    <% } %>
+                </a> 
+                <ul class="dropdown-menu text-small">
+                    <li class="text-center" onclick='changeLan("en")'>
+                        EN
+                    </li> 
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li> 
+                    <li class="text-center" onclick='changeLan("lv")'>
+                        LV
+                    </li> 
+                </ul> 
+            </div>
             <div class="dropdown text-end"> 
                 <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
                     <img src="
@@ -38,13 +64,31 @@
                         <hr class="dropdown-divider">
                     </li> 
                     <li>
-                        <a class="dropdown-item" href="/create">Create image</a>
+                        <a class="dropdown-item" href="/create">
+                            <% if (lan=="lv") { %>
+                            Izveidot bildi
+                            <% } else { %>
+                            Create image
+                            <% } %>
+                        </a>
                     </li> 
                     <li>
-                        <a class="dropdown-item" href="/settings">Settings</a>
+                        <a class="dropdown-item" href="/settings">
+                            <% if (lan=="lv") { %>
+                            Opcijas
+                            <% } else { %>
+                            Settings
+                            <% } %>
+                        </a>
                     </li> 
                     <li>
-                        <a class="dropdown-item" href="/profile">Profile</a>
+                        <a class="dropdown-item" href="/profile">
+                            <% if (lan=="lv") { %>
+                            Profils
+                            <% } else { %>
+                            Profile
+                            <% } %>
+                        </a>
                     </li> 
                     <li>
                         <hr class="dropdown-divider">
@@ -59,15 +103,30 @@
                         <% } %>
                         >
                         <% if(locals.prof_log){ %>
-                        <%=prof_log%>
+                        <% if (lan=="lv") { %>
+                        Ielogoties
                         <% } else { %>
-                        Log in
+                        <%=prof_log%>
+                        <% } %>
+                        
+                        <% } else { %>
+                        <% if (lan=="lv") { %>
+                        Ielogoties
+                        <% } else { %>
+                        Log In
+                        <% } %>
                         <% } %>
                         </a>
                     </li>
                     <% if(!locals.prof_log||locals.prof_log=="Log in"){ %>
                         <li>
-                            <a class="dropdown-item" href="/register">Register</a>
+                            <a class="dropdown-item" href="/register">
+                                <% if (lan=="lv") { %>
+                                Reģistrēties
+                                <% } else { %>
+                                Register
+                                <% } %>
+                            </a>
                         </li>
                     <% } %>
                 </ul> 
@@ -75,3 +134,11 @@
         </div> 
     </div> 
 </header>
+<script>
+    async function changeLan(lan){
+        fetch(`/lan/${lan}`, {
+            method: "POST"
+        });
+        location.reload();
+    }
+</script>

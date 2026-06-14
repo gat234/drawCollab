@@ -10,5 +10,7 @@ router.post('/register',reg_controller.Register);
 router.get('/logout',log_controller.logOut);
 router.get('/profile',pro_controller.openProfile);
 router.post('/changeImgUsr',pro_controller.changeImgUsr);
+router.post('/lan/:language',pro_controller.changeLan);
+router.post('/deleteAccount',pro_controller.deleteAcc);
 
 module.exports = router;

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/drawing/style/stils.css">
 </head>
 <body>
-    <%- include('../partial/header.ejs',{dot:".."}) %>
+    <%- include('../partial/header.ejs',{dot:"..",lan:lan}) %>
     <div class="hidden" id="imgData"><%=c%></div>
     <div id="color" class="canv"><canvas width="0" height="0"></canvas></div>
     <div id="moveable" class="controlP" style="top:200px;left:200px">
@@ -18,7 +18,13 @@
             <a id="bucket" class="tIcon"></a>
             <a id="moveView" class="tIcon"></a>
         </div>
-        <button class="saveBtn btn btn-secondary" onclick="saveImage()">Save</button>
+        <button class="saveBtn btn btn-secondary" onclick="saveImage()">
+            <% if (lan=="lv") { %>
+            Saglabāt
+            <% } else { %>
+            Save
+            <% } %>
+        </button>
         <label for="toolOption" class="form-label">Pencil size <input type="number" value="2" id="num"></label>
         
         <input type="range" class="form-range" min="1" max="100" id="toolOption">

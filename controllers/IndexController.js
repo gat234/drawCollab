@@ -19,8 +19,9 @@ exports.getIndex = async (req,res)=>{
         numOfImg=10;
     }
     let pageArr = Array.from({length: numOfImg}, (_, i) => i + 1);
-    
-    let tempData = await prep.prepareHeader(req.session.token);
+    let lan = req.session.lan;
+    if (!req.session.lan){lan="EN"}
+    let tempData = await prep.prepareHeader(req.session.token,lan);
     tempData.publImg = await imgFun.getImgData(img);
     if(pageArr.length>1){
         tempData.pageFooter=pageArr;
@@ -34,8 +35,10 @@ exports.getIndexPage = async (req,res)=>{
     const img = await images.getPublicImages((req.params.page-1)*10);
     let numOfImg = await images.getNumPublicImages();
     numOfImg=Math.ceil((numOfImg-imgOff)/10);
+    let lan = req.session.lan;
     
-    let tempData = await prep.prepareHeader(req.session.token);
+    if (!req.session.lan){lan="EN"}
+    let tempData = await prep.prepareHeader(req.session.token,lan);
     tempData.publImg = await imgFun.getImgData(img);
     if(numOfImg>10){
         numOfImg=10;
@@ -58,7 +61,9 @@ exports.settings = async (req,res)=>{
         res.redirect("/");
         return;
     }
-    let tempData = await prep.prepareHeader(req.session.token);
+    let lan = req.session.lan;
+    if (!req.session.lan){lan="EN"}
+    let tempData = await prep.prepareHeader(req.session.token,lan);
     res.render('profile/settings', tempData);
 }
 exports.postPFP = async (req,res)=>{
@@ -121,7 +126,9 @@ exports.changeAccount = async (req,res)=>{
                 req.session.token = tkn;
                 await users.setToken(tkn,name.ID);
             }
-            let getHeader=await prep.prepareHeader(req.session.token);
+            let lan = req.session.lan;
+            if (!req.session.lan){lan="EN"}
+            let getHeader=await prep.prepareHeader(req.session.token,lan);
             getHeader=Object.assign(getHeader,{ 
                 name: pst.name,
                 nameErr: check.nameErr, 

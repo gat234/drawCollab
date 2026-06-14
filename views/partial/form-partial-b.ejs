@@ -1,6 +1,18 @@
         <div class="form-floating">
-          <input type="password" name="pass" value="<%=pass%>" class="form-control" id="floatingPassword" placeholder="Password">
-          <label for="floatingPassword">Password</label>
+          <input type="password" name="pass" value="<%=pass%>" class="form-control" id="floatingPassword" placeholder="
+          <% if (lan=="lv") { %>
+          Parole
+          <% } else { %>
+          Password
+          <% } %>
+          ">
+          <label for="floatingPassword">
+            <% if (lan=="lv") { %>
+            Parole
+            <% } else { %>
+            Password
+            <% } %>
+          </label>
           <span class="error"><%=passErr%></span>
         </div>
         <div class="d-flex">

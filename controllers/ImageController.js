@@ -29,7 +29,9 @@ exports.imageView=async (req,res,next)=>{
         imgName:imgData.name,
         level:2
     };
-    let h = await prep.prepareHeader(req.session.token);
+    let lan = req.session.lan;
+    if (!req.session.lan){lan="EN"}
+    let h = await prep.prepareHeader(req.session.token,lan);
     Object.assign(render,h);
     res.render('img/imgView', render);
 }
@@ -83,8 +85,9 @@ exports.open=async (req,res,next)=>{
                 } catch {
                     
                 }
-                
-                let render = await prep.prepareHeader(req.session.token);
+                let lan = req.session.lan;
+                if (!req.session.lan){lan="EN"}
+                let render = await prep.prepareHeader(req.session.token,lan);
                 Object.assign(render,{ 
                     c:c.toDataURL(),
                     level:2,
@@ -101,7 +104,9 @@ exports.open=async (req,res,next)=>{
 }
 exports.creator = async (req,res)=>{
     if(req.session.token){
-        let h = await prep.prepareHeader(req.session.token);
+        let lan = req.session.lan;
+        if (!req.session.lan){lan="EN"}
+        let h = await prep.prepareHeader(req.session.token,lan);
         Object.assign(h,{ 
             self: req.originalUrl, 
             time: Date.now(),
@@ -141,6 +146,9 @@ exports.newImage = async (req,res,next)=>{
         } else {
             let r = ran.rand(15);
             req.session.rand = r;
+            if(!req.session.lan){
+                req.session.lan="en";
+            }
             res.render('img/new_img', { 
                 self: req.originalUrl, 
                 time: Date.now(),
@@ -150,7 +158,8 @@ exports.newImage = async (req,res,next)=>{
                 width: pst.width, 
                 widthErr: check.widthErr, 
                 height: pst.height, 
-                heightErr: check.heightErr
+                heightErr: check.heightErr,
+                lan:req.session.lan
             });
             return;
         }
