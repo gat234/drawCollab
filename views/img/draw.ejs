@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/drawing/stils.css">
+    <title><%= imgName %></title>
+    <link rel="icon" type="image/x-icon" href="/images/default/icon.ico">
+    <link rel="stylesheet" href="/drawing/style/stils.css">
 </head>
 <body>
-    <%- include('./partial/header.ejs',{dot:".."}) %>
-    <div id="bbbb"></div><div class="hidden" id="imgData"><%=c%></div>
-    <div id="color" class="canv"><canvas width="200" height="200"></canvas></div>
+    <%- include('../partial/header.ejs',{dot:".."}) %>
+    <div class="hidden" id="imgData"><%=c%></div>
+    <div id="color" class="canv"><canvas width="0" height="0"></canvas></div>
     <div id="moveable" class="controlP" style="top:200px;left:200px">
         <input type="color" id="lol" value="#ff0000" class="colChoo">
         <div class="toolBox">
@@ -23,6 +24,8 @@
         <input type="range" class="form-range" min="1" max="100" id="toolOption">
     </div>
     
-    <script src="/drawing/draw.js"></script>
+    <script src="/drawing/scr/draw.js"></script>
+    <script src="/drawing/scr/init.js"></script>
+    <script src="/drawing/scr/webCon.js"></script>
 </body>
 </html>

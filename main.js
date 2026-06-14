@@ -8,7 +8,7 @@ const ind=require("./routes/index_page.js");
 const session = require("express-session");
 const bodyParser = require('body-parser');
 const webSckServ = require("./websocket.js");
-
+const prep = require("./helpers/tempFunc.mjs")
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
     secret: "c6310b6d",
@@ -23,4 +23,8 @@ app.use("/", usr);
 app.use("/", img_router);
 app.listen(PORT, () => {
     console.log(`Server Established at PORT -> ${PORT}`);
+});
+app.use( ( req, res, next ) => {
+    let getH = prep.prepareHeader(req.session.token);
+    res.status( 404 ).render('404', getH);
 });

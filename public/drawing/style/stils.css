@@ -28,7 +28,7 @@ canvas{
     background-color: #0000004f;
 }
 #bucket{
-    background-image: url("./img/bucket.svg");
+    background-image: url("../img/bucket.svg");
 }
 
 .toolBox{
@@ -59,17 +59,17 @@ canvas{
     
 }
 #pencil{
-    background-image: url("./img/pencil.svg");
+    background-image: url("../img/pencil.svg");
 }
 #moveView{
-    background-image: url("./img/moveView.svg");
+    background-image: url("../img/moveView.svg");
 }
 .overlay {
   position: fixed;
   width: 5vh;
   height: 5vh;
   z-index: 2;
-  background-image: url('./img/cursor.png');
+  background-image: url('../img/cursor.png');
   background-size: 5vh;
   background-repeat: no-repeat;
 }

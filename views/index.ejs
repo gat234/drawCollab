@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Collaborative drawing!</title>
     <link rel="icon" type="image/x-icon" href="/images/default/icon.ico">
+    <link rel="stylesheet" href="/index/indx.css">
     <style>
         body{
             background: #f8f9fa;
@@ -12,25 +13,28 @@
     </style>
 </head>
 <body>
-    <%- include('./partial/header.ejs',{dot:".",mainCheck:true}) %>
+    <% if (locals.isPage) { %>
+        <%- include('./partial/header.ejs',{dot:"..",mainCheck:true}) %>
+    <% } else { %>
+        <%- include('./partial/header.ejs',{dot:".",mainCheck:true}) %>
+    <% } %>
     <div class="album py-5 bg-body-tertiary"> 
         <div class="container"> 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3"> 
                 <% for (let i = 0; i < publImg.length; i++) { %>
                     <div class="col"> 
-                        <div class="card shadow-sm "> 
-                            <img src="<%= publImg[i].dUrl %>" >
+                        <div class="card shadow-sm mh-10"> 
+                            <div style="background-image: url('<%= publImg[i].dUrl %>');" class="drawing"></div>
                             <div class="card-body"> 
                                 <h1 class="card-text"><%= publImg[i].name %></h1>
                                 <p class="card-text"><%= publImg[i].desc %></p>
                                 <div class="d-flex justify-content-between align-items-center"> 
                                     <div class="btn-group"> 
-                                        <a type="button" class="btn btn-sm btn-outline-secondary" href="./imageView/<%= publImg[i].url %>">View</a> 
+                                        <a type="button" class="btn btn-sm btn-outline-secondary" href="/imageView/<%= publImg[i].url %>">View</a> 
                                         <% if(publImg[i].visibility==0) { %>
-                                        <a type="button" class="btn btn-sm btn-outline-secondary" href="./image/<%= publImg[i].url %>">edit</a>
+                                        <a type="button" class="btn btn-sm btn-outline-secondary" href="/image/<%= publImg[i].url %>">edit</a>
                                         <% } %>
                                     </div> 
-                                    <!-- <small class="text-body-secondary">9 mins</small>  -->
                                 </div>
                             </div> 
                         </div> 
@@ -41,5 +45,31 @@
             </div>
         </div>
     </div>
+    <footer class="py-3 my-4"> 
+        <% if (locals.pageFooter){ %>
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3"> 
+            <% for (let i = 0; i < pageFooter.length; i++) { %>
+                <% if (i==0) { %>
+                    <% if (pageFooter[i]>1) { %>
+                        <li class="nav-item">
+                            <a href="/page/<%=pageFooter[i]-1%>">
+                                <img class="bi me-2" width="10" height="40" role="img" aria-label="Bootstrap" src="/index/back.svg">
+                            </a>
+                        </li>
+                    <% } %>
+                    <li class="nav-item p-1">
+                        <a href="/page/<%=pageFooter[i]%>" class="btn btn-secondary disabled" tabindex="-1" role="button" aria-disabled="true"><%=pageFooter[i]%></a>
+                    </li>
+                    
+                <% } else { %>
+                    <li class="nav-item p-1">
+                        <a href="/page/<%=pageFooter[i]%>" class="btn btn-secondary" role="button" aria-disabled="true"><%=pageFooter[i]%></a>
+                    </li>
+                <% } %>
+            <% } %>
+            </ul>
+        <% } %>
+        <p class="text-center text-body-secondary">Gatis Smilga</p> 
+    </footer>
 </body>
 </html>

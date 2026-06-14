@@ -1,9 +1,11 @@
 let images = require('../models/image.mjs');
-let help = require('../helpers/helpFunc.mjs');
 let users = require('../models/users.mjs');
 let crypto = require("crypto");
 const path = require('path');
 const canvas = require("canvas");
+let prep = require('../helpers/tempFunc.mjs');
+let rand = require('../helpers/encrFunc.mjs');
+let val = require('../helpers/checkInpFunc.mjs');
 exports.imageView=async (req,res,next)=>{
     let img = await images.getImgByUrl(req.params.location,["name","width","height"]);
     if(!img[0]){
@@ -27,9 +29,9 @@ exports.imageView=async (req,res,next)=>{
         imgName:imgData.name,
         level:2
     };
-    let h = await help.prepareHeader(req.session.token);
+    let h = await prep.prepareHeader(req.session.token);
     Object.assign(render,h);
-    res.render('imgView', render);
+    res.render('img/imgView', render);
 }
 exports.open=async (req,res,next)=>{
     if(req.session.token){
@@ -40,22 +42,32 @@ exports.open=async (req,res,next)=>{
         }
         let usr = name[0].dataValues;
         req.session.name = usr.name;
-        let img = await images.getImgByUrl(req.params.location,["ID","access_type","width","height","visit"])
+        let img = await images.getImgByUrl(req.params.location,["ID","access_type","width","height","visit","name"])
         if(!img[0]){
             res.redirect("/");
         } else {
             let data = img[0].dataValues
             let access = data.access_type;
             if(access==2||access==3){
-                let usr_ID = await images.getImgUsers(data.ID,["usr_ID"]);
-                //FIX
+                let usr_ID = await images.getImgUsers(data.ID,["user_ID"]);
                 for(let i =0;i<usr_ID.length;i++){
-                    if(usr.ID==usr_ID[i].dataValues.ID){
-                        // res.sendFile(path.join(__dirname, '../public/drawing/index.html'));
-                        res.render('draw', { 
-                            c:c.toDataURL()
-                        });
+                    console.log(usr.ID,usr_ID[i].dataValues,path.join(__dirname, `../usr_images/${req.params.location}.png`))
+                    if(usr.ID==usr_ID[i].dataValues.user_ID){                   
                         await images.addVisitToImg(data.ID,data.visit);
+                        let c = canvas.createCanvas(data.width,data.height);
+                        let ctx = c.getContext("2d");
+                        try{
+                            await canvas.loadImage(path.join(__dirname, `../usr_images/${req.params.location}.png`))
+                            .then((img)=>{
+                                ctx.drawImage(img,0,0);
+                            })
+                        } catch {
+
+                        }
+                        res.render('img/draw', { 
+                            c:c.toDataURL(),
+                            imgName:data.name
+                        });
                         return;
                     }
                 }
@@ -69,15 +81,16 @@ exports.open=async (req,res,next)=>{
                         ctx.drawImage(img,0,0);
                     })
                 } catch {
-                    
+                    c = ""
                 }
                 
-                let render = await help.prepareHeader(req.session.token);
+                let render = await prep.prepareHeader(req.session.token);
                 Object.assign(render,{ 
-                   c:c.toDataURL(),
-                   level:2
+                    c:c.toDataURL(),
+                    level:2,
+                    imgName:data.name
                 });
-                res.render('draw', render);
+                res.render('img/draw', render);
                 return;
             }
         }
@@ -88,7 +101,7 @@ exports.open=async (req,res,next)=>{
 }
 exports.creator = async (req,res)=>{
     if(req.session.token){
-        let h = await help.prepareHeader(req.session.token);
+        let h = await prep.prepareHeader(req.session.token);
         Object.assign(h,{ 
             self: req.originalUrl, 
             time: Date.now(),
@@ -100,7 +113,7 @@ exports.creator = async (req,res)=>{
             height: "", 
             heightErr: ""
         })
-        res.render('new_img', h);
+        res.render('img/new_img', h);
     } else {
         res.redirect("/");
     }
@@ -110,7 +123,7 @@ exports.newImage = async (req,res,next)=>{
     if(req.session.token){
         let usr_ID = await users.checkToken(req.session.token,["ID"]);
         let pst = req.body;
-        let check = await help.imgValidity(pst.name,pst.width,pst.height);
+        let check = await val.imgValidity(pst.name,pst.width,pst.height);
         if(check.nameErr == "" && check.widthErr == "" && check.heightErr == ""){
             let newURL = crypto.randomBytes(18).toString('hex');
             while(true){
@@ -121,14 +134,14 @@ exports.newImage = async (req,res,next)=>{
                     newURL = crypto.randomBytes(18).toString('hex');
                 }
             }
-            usr_ID=usr_ID[0].dataValues.ID
+            usr_ID=usr_ID[0].dataValues.ID;
             await images.createImage(check.name,check.width,check.height,newURL,pst.visibility,usr_ID);
             res.redirect("./image/"+newURL);
             return;
         } else {
-            let r = help.rand(15);
+            let r = rand.rand(15);
             req.session.rand = r;
-            res.render('new_img', { 
+            res.render('img/new_img', { 
                 self: req.originalUrl, 
                 time: Date.now(),
                 rand: r, 

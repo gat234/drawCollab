@@ -3,16 +3,48 @@ let images = require('../models/image.mjs');
 const canvas = require("canvas");
 const path = require('path');
 const fs = require('fs');
-let help = require('../helpers/helpFunc.mjs');
-
-
+let val = require('../helpers/checkInpFunc.mjs');
+let prep = require('../helpers/tempFunc.mjs');
+let imgFun = require('../helpers/imageFunc.mjs');
+let crFun = require('../helpers/encrFunc.mjs');
 
 exports.getIndex = async (req,res)=>{
-    const img = await images.getPublicImages();
+    const img = await images.getPublicImages(0);
+    let numOfImg = await images.getNumPublicImages();
+
+    if(numOfImg>10){
+        numOfImg=Math.ceil(numOfImg/10);
+    }
+    if(numOfImg>10){
+        numOfImg=10;
+    }
+    let pageArr = Array.from({length: numOfImg}, (_, i) => i + 1);
     
-    let tempData = await help.prepareHeader(req.session.token);
-    tempData.publImg = await help.getImgData(img);
-    console.log(tempData)
+    let tempData = await prep.prepareHeader(req.session.token);
+    tempData.publImg = await imgFun.getImgData(img);
+    if(pageArr.length>1){
+        tempData.pageFooter=pageArr;
+    }
+
+    res.render('index', tempData);
+};
+exports.getIndexPage = async (req,res)=>{
+    req.params.page = parseInt(req.params.page)
+    let imgOff = (req.params.page-1)*10;
+    const img = await images.getPublicImages((req.params.page-1)*10);
+    let numOfImg = await images.getNumPublicImages();
+    numOfImg=Math.ceil((numOfImg-imgOff)/10);
+    
+    let tempData = await prep.prepareHeader(req.session.token);
+    tempData.publImg = await imgFun.getImgData(img);
+    if(numOfImg>10){
+        numOfImg=10;
+    }
+    let pageArr = Array.from({length: numOfImg}, (_, i) => (i + req.params.page));
+
+    tempData.pageFooter=pageArr;
+    tempData.isPage = true;
+
     res.render('index', tempData);
 };
 exports.settings = async (req,res)=>{
@@ -26,8 +58,8 @@ exports.settings = async (req,res)=>{
         res.redirect("/");
         return;
     }
-    let tempData = await help.prepareHeader(req.session.token);
-    res.render('settings', tempData);
+    let tempData = await prep.prepareHeader(req.session.token);
+    res.render('profile/settings', tempData);
 }
 exports.postPFP = async (req,res)=>{
     
@@ -40,7 +72,7 @@ exports.postPFP = async (req,res)=>{
             let moved = false;
             fs.rename(path.join(__dirname, "../", req.file.path),fPath,() => {moved=true;})
             while(!moved){
-                await help.sleep(40);
+                await val.sleep(40);
             }
             try{
                 await canvas.loadImage(fPath)
@@ -69,27 +101,27 @@ exports.changeAccount = async (req,res)=>{
         if(name[0]){
             name=name[0].dataValues;
             let pst = req.body;
-            let check = await help.regValidity(pst.name,pst.pass,"");
+            let check = await val.regValidity(pst.name,pst.pass,"");
             if(check.nameErr==""){
                 let oPath = path.join(__dirname, "../public/images/userPFP/",name.name+".png");
                 let nPath = path.join(__dirname, "../public/images/userPFP/",pst.name+".png");
                 let moved = false;
                 fs.rename(oPath,nPath,() => {moved=true;})
                 while(!moved){
-                    await help.sleep(40);
+                    await val.sleep(40);
                 }
                 await users.setName(pst.name,name.ID);
-                let tkn = help.createToken();
+                let tkn = crFun.createToken();
                 req.session.token = tkn;
                 await users.setToken(tkn,name.ID);
             }
             if(check.passErr==""){
-                await users.setPassword(help.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|"),name.ID);
-                let tkn = help.createToken();
+                await users.setPassword(crFun.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|"),name.ID);
+                let tkn = crFun.createToken();
                 req.session.token = tkn;
                 await users.setToken(tkn,name.ID);
             }
-            let getHeader=await help.prepareHeader(req.session.token);
+            let getHeader=await prep.prepareHeader(req.session.token);
             getHeader=Object.assign(getHeader,{ 
                 name: pst.name,
                 nameErr: check.nameErr, 
@@ -97,7 +129,7 @@ exports.changeAccount = async (req,res)=>{
                 passErr: check.passErr,
                 path:req.originalUrl
             })
-            res.render('settings', getHeader);
+            res.render('profile/settings', getHeader);
         } else {
             res.redirect("/");
         }

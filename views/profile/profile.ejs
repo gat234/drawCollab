@@ -19,7 +19,7 @@
     </script>
 </head>
 <body>
-    <%- include('./partial/header.ejs',{dot:".",mainCheck:true}) %>
+    <%- include('../partial/header.ejs',{dot:".",mainCheck:true}) %>
     <div class="px-4 py-5 my-5 text-center"> 
                      
         <img src="<%=pfpUrl%>" alt="usrPFP" width="32" height="32" class="d-block mx-auto mb-4" width="72" height="57">
@@ -32,12 +32,15 @@
         <div class="container"> 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3"> 
                 <% for (let i = 0; i < publImg.length; i++) { %>
-                    <div class="col" data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="
+                    <div class="col" 
+                    <% if(publImg[i].visibility!=0 && publImg[i].visibility!=1) {%>
+                    data-bs-html="true" data-bs-toggle="tooltip" data-bs-title="
                     Users: <br>
                     <% for (let x = 0; x < publImg[i].users.length-1; x++) { %>
                     <%= publImg[i].users[x] %>,<br>
                     <% } %>
                     <%= publImg[i].users[publImg[i].users.length-1] %>
+                    <% } %>
                     ">
                     
                         <div class="card shadow-sm"> 

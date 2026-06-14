@@ -66,7 +66,7 @@ wss.on('connection', function connection(ws,req) {
                 
                 let imga = await img[0].dataValues;
                 if(imga.access_type==2||imga.access_type==3){
-                    let check = await image.checkImgUser(imga.id,usr_name);
+                    let check = await image.checkImgUser(imga.id,name[0].dataValues.ID);
                     if(!check[0]){
                         return;
                     }

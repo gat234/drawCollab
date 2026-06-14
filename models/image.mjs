@@ -1,6 +1,10 @@
-
 import { sequelize,dataTypes,op } from '../helpers/sequelizeInit.mjs';
 import {findUser} from './users.mjs'
+import {unlink} from 'fs'
+import { fileURLToPath } from 'url';
+import path,{ dirname } from 'path'
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const images_Model = sequelize.define(
   'images',
   {
@@ -109,7 +113,6 @@ export async function toggleImgUser(imgID,userID){
   let usrImg = await getUsersImg(userID);
   let found = false;
   for(let i=0;i<usrImg.length;i++){
-    console.log(imgID,usrImg[i].dataValues.img_ID,userID)
     if(imgID==usrImg[i].dataValues.img_ID){
       found = true;
       break;
@@ -128,13 +131,34 @@ export async function toggleImgUser(imgID,userID){
         ]
       }
     });
+    let checkZero = await getImgUsers(imgID,["ID"]);
+    if(!checkZero[0]){
+      let imgUrl = await getImgUrlByID(imgID);
+      if(imgUrl[0]){
+        imgUrl = imgUrl[0].dataValues.url;
+        unlink(path.join(__dirname, `../usr_images/${imgUrl}.png`),()=>{});
+      }
+      await images_Model.destroy({
+        where:{
+          ID:imgID
+        }
+      });
+    }
   } else {
     res = await addImgUser(imgID,userID);
   }
   
   return res;
 }
-
+async function getImgUrlByID(imgID){
+  let res = await images_Model.findAll({
+    where:{
+      ID: imgID
+    },
+    attributes: ["url"]
+  });
+  return res;
+}
 export async function checkImgUser(imgID,userID){
   let res = await img_Usr_Model.findAll({
     attributes: ["ID"],
@@ -177,10 +201,11 @@ export async function createImage(name,w,h,url,access,usrID){
     url:url,
     access_type:access
   });
-  await addImgUser(res.dataValues.ID,usrID);
+  console.log(res.id,usrID)
+  await addImgUser(res.id,usrID);
   return res;
 }
-export async function getPublicImages(){
+export async function getPublicImages(num){
   let res = await images_Model.findAll({
     where:{
       access_type: [0,2]
@@ -189,7 +214,16 @@ export async function getPublicImages(){
     order:[
       ["visit","DESC"]
     ],
-    limit:10
+    limit:10,
+    offset:num
+  });
+  return res;
+}
+export async function getNumPublicImages(){
+  let res = await images_Model.count({
+    where:{
+      access_type: [0,2]
+    }
   });
   return res;
 }

@@ -6,7 +6,7 @@
     <div class="container"> 
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">  
             <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none"> 
-                <img class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap" src="<%=dot%>/images/default/icon.svg">
+                <img class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap" src="/images/default/icon.svg">
             </a>
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"> 
                 <% if(!locals.mainCheck){ %>
@@ -14,10 +14,7 @@
                         <a href="../" class="nav-link px-2 link-body-emphasis">Go back</a>
                     </li> 
                 <% } %>
-            </ul> 
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search"> 
-                <input type="search" class="form-control" placeholder="Search..." aria-label="Search"> 
-            </form> 
+            </ul>  
             <div class="dropdown text-end"> 
                 <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
                     <img src="
@@ -41,13 +38,13 @@
                         <hr class="dropdown-divider">
                     </li> 
                     <li>
-                        <a class="dropdown-item" href="<%=dot%>/create">Create image</a>
+                        <a class="dropdown-item" href="/create">Create image</a>
                     </li> 
                     <li>
-                        <a class="dropdown-item" href="<%=dot%>/settings">Settings</a>
+                        <a class="dropdown-item" href="/settings">Settings</a>
                     </li> 
                     <li>
-                        <a class="dropdown-item" href="<%=dot%>/profile">Profile</a>
+                        <a class="dropdown-item" href="/profile">Profile</a>
                     </li> 
                     <li>
                         <hr class="dropdown-divider">
@@ -56,9 +53,9 @@
                     <li>
                         <a class="dropdown-item" href=
                         <% if(locals.signUrl){ %>
-                        "<%=dot%><%=signUrl%>"
+                        "<%=signUrl%>"
                         <% } else { %>
-                        "<%=dot%>/login"
+                        "/login"
                         <% } %>
                         >
                         <% if(locals.prof_log){ %>
@@ -70,7 +67,7 @@
                     </li>
                     <% if(!locals.prof_log||locals.prof_log=="Log in"){ %>
                         <li>
-                            <a class="dropdown-item" href="<%=dot%>/register">Register</a>
+                            <a class="dropdown-item" href="/register">Register</a>
                         </li>
                     <% } %>
                 </ul> 

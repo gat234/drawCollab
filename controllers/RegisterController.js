@@ -1,26 +1,27 @@
 let users = require('../models/users.mjs');
-let help = require('../helpers/helpFunc.mjs');
 let crypto = require("crypto");
+let enc = require('../helpers/encrFunc.mjs');
+let imgFun = require('../helpers/imageFunc.mjs');
 
 
 exports.Register=async (req,res,next)=>{
     let pst = req.body;
-    let check = await help.regValidity(pst.name,pst.pass,pst.email);
+    let check = await enc.regValidity(pst.name,pst.pass,pst.email);
     if(pst.submit && pst.randcheck == req.session.rand){
         if(check.nameErr==""&&check.passErr==""&&check.emailErr==""){
-            let enc = help.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|");
-            let tkn = help.createToken();
+            let enc = enc.encrypt(check.pass, "OFbxO2O9KV~923rT|p]aQ}s|");
+            let tkn = enc.createToken();
             req.session.token = tkn;
             await users.createUser(check.name,enc,check.email,tkn);
             res.redirect("/");
-            help.createPfp(check.name);
+            imgFun.createPfp(check.name);
             return;
         }
     }
 
-    let r = help.rand(15);
+    let r = enc.rand(15);
     req.session.rand = r;
-    res.render('register', { 
+    res.render('form/register', { 
         self: req.originalUrl, 
         time: Date.now(),
         rand: r, 
@@ -36,9 +37,9 @@ exports.Register=async (req,res,next)=>{
     });
 };
 exports.getRegisterPage = async (req,res)=>{
-    let r = help.rand(15);
+    let r = enc.rand(15);
     req.session.rand = r;
-    res.render('register', { 
+    res.render('form/register', { 
         self: req.originalUrl, 
         time: Date.now(),
         rand: r, 

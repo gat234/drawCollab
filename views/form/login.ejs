@@ -1,10 +1,10 @@
-<%- include('./partial/form-partial-t.ejs',{title:"Log In"}) %>
-                <h1 class="h3 mb-3 fw-normal">Log in</h1>
+<%- include('../partial/form-partial-t.ejs',{title:"Log In"}) %>
+                <h1 class="h3 mb-3 fw-normal text-center">Log in</h1>
                 <input type="hidden" value="<%=rand%>" name="randcheck" />
                 <div class="form-floating">
                 <input type="text" name="name" value="<%=name%>" class="form-control" id="floatingInput" placeholder="name@example.com">
                 <label for="floatingInput">Email or Username</label>
                 <span class="error"><%=nameErr%></span>
                 </div>
-<%- include('./partial/form-partial-b.ejs') %>
+<%- include('../partial/form-partial-b.ejs') %>
 
