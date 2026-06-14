@@ -8,14 +8,14 @@ CREATE TABLE `images` (
   `height` int(11) NOT NULL,
   `visit` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-)
+);
 
 CREATE TABLE `img_owners` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `user_ID` int(11) NOT NULL FOREIGN KEY REFERENCES users(ID),
   `img_ID` int(11) NOT NULL FOREIGN KEY REFERENCES images(ID),
   PRIMARY KEY (`ID`)
-)
+);
 
 CREATE TABLE `users` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -26,4 +26,4 @@ CREATE TABLE `users` (
   `token` text NOT NULL,
   `error` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-)
+);

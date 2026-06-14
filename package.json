@@ -1,0 +1,32 @@
+{
+  "name": "drawcollab",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gat234/drawCollab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gat234/drawCollab/issues"
+  },
+  "homepage": "https://github.com/gat234/drawCollab#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "canvas": "^3.2.3",
+    "crypto": "^1.0.1",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "websocket": "^1.0.35"
+  }
+}
